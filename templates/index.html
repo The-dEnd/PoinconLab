@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affichage YOLO</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Poinçon LAB</h1>
+    <!-- Barre de navigation -->
+    <nav>
+        <ul>
+            <li><a href="/" class="active">Visualisation</a></li>
+            <li><a href="/analyse">Analyse</a></li>
+            <li><a href="/upload_model">Upload Model</a></li>
+            <li><a href="/predict">Prediction</a></li>
+        </ul>
+    </nav>
+
+    <!-- Section de filtre -->
+    <div class="container">
+        <div id="filters">
+            <h2>Filtres</h2>
+            <label for="category">Catégorie :</label>
+            <select id="category">
+                <option value="toutes">Toutes</option>
+                <option value="plusieurs">Plusieurs</option>
+                <option value="seul">Seul</option>
+            </select>
+
+            <label for="subcategory">Sous-catégorie :</label>
+            <select id="subcategory">
+                <option value="toutes">Toutes</option>
+                <option value="visible">Visible</option>
+                <option value="nonvisible">Non visible</option>
+                <option value="deux">Deux</option>
+            </select>
+            <div>
+                <input type="checkbox" id="unmatched-only" />
+                <label for="unmatched-only">Sans aucune box correcte</label>
+            </div>
+
+            <button id="apply-filters">Appliquer</button>
+        </div>
+
+        <!-- Section liste des images -->
+        <div id="image-selector">
+            <h2 id="img-dispo">Images disponibles</h2>
+            <ul id="image-list"></ul>
+        </div>
+
+        <!-- Section d'affichage de l'image -->
+        <div id="image-display">
+            <h2 id="img-name">Image sélectionnée</h2>
+            <div style="position: relative; display: inline-block;">
+                <img id="selected-image" src="" alt="Sélectionnez une image" style="max-width: 500px;">
+                <canvas id="bounding-boxes" style="position: absolute; top: 0; left: 0;"></canvas>
+            </div>
+                <!-- Navigation -->
+            <div id="image-navigation">
+                <button id="prev-image">Précédent</button>
+                <button id="next-image">Suivant</button>
+            </div>
+        </div>
+
+        <!-- Section de gestion des boîtes -->
+        <!-- Section de gestion des boîtes et des statistiques -->
+        <div id="box-details">
+            <div>
+                <h2>Boîtes (Bounding Boxes)</h2>
+                <ul id="boxes-details"></ul>
+            </div>
+
+
+            <!-- Section pour afficher les informations globales -->
+            <div id="global-info">
+                <h3>Statistiques globales</h3>
+                <p id="global-text"></p> <!-- Pour afficher le nombre de poinçons -->
+                <p id="matched-text"></p> <!-- Pour afficher le nombre de boîtes correctement associées -->
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/scripts.js"></script>
+</body>
+</html>

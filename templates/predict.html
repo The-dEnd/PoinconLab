@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Faire une prédiction</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        form {
+            max-width: 600px;
+            margin: auto;
+            background: #fffaf2;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, select {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background: #8c6b4e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .results {
+            max-width: 800px;
+            margin: 40px auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .result-box {
+            text-align: center;
+        }
+        .result-box img {
+            max-width: 350px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Poinçon LAB</h1>
+
+    <!-- Barre de navigation -->
+    <nav>
+        <ul>
+            <li><a href="/">Visualisation</a></li>
+            <li><a href="/analyse">Analyse</a></li>
+            <li><a href="/upload_model">Upload Model</a></li>
+            <li><a href="/predict" class="active">Prediction</a></li>
+        </ul>
+    </nav>
+<h1 style="text-align: center; color: #5a4634">Faire une prédiction sur une image</h1>
+
+<form action="/predict_image" method="POST" enctype="multipart/form-data">
+    <label for="image">Choisir une image :</label>
+    <input type="file" name="image" id="image" accept="image/*" required>
+
+    <label for="models">Choisir un ou plusieurs modèles :</label>
+    <select name="models" id="models" multiple required>
+        {% for model in models %}
+        <option value="{{ model[0] }}::{{ model[1] }}">{{ model[0] }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="submit" value="Lancer la prédiction">
+</form>
+
+{% if results %}
+<div class="results">
+    {% for name, path in results %}
+    <div class="result-box">
+        <h3>{{ name }}</h3>
+        <img src="{{ path }}" alt="Résultat {{ name }}">
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</body>
+</html>

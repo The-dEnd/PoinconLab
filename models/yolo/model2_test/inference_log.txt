@@ -1,0 +1,39 @@
+[34m[1mval: [0mdata=C:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\models\config.yaml, weights=['C:\\Users\\malco\\OneDrive\\Documents\\TER-2024-2025-Poincon\\Codes\\PoinconLab\\models\\yolo\\Yacine\\runs\\train\\exp\\weights\\best.pt'], batch_size=32, imgsz=640, conf_thres=0.001, iou_thres=0.6, max_det=300, task=test, device=, workers=8, single_cls=False, augment=False, verbose=False, save_txt=True, save_hybrid=False, save_conf=True, save_json=False, project=C:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\models\yolo\Yacine\runs\test, name=., exist_ok=False, half=False, dnn=False
+YOLOv5  v7.0-411-gf4d8a84c Python-3.12.4 torch-2.4.1+cpu CPU
+
+Fusing layers... 
+Model summary: 322 layers, 86321452 parameters, 0 gradients, 204.2 GFLOPs
+
+[34m[1mtest: [0mScanning C:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\static\labels.cache... 205 images, 0 backgrounds, 1 corrupt: 100%|##########| 205/205 [00:00<?, ?it/s]
+[34m[1mtest: [0mScanning C:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\static\labels.cache... 205 images, 0 backgrounds, 1 corrupt: 100%|##########| 205/205 [00:00<?, ?it/s]
+[34m[1mtest: [0mWARNING  C:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\static\images\IMG_3363.JPG: ignoring corrupt image/label: negative label values [   -0.30019]
+
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:   0%|          | 0/7 [00:00<?, ?it/s]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:  14%|#4        | 1/7 [01:16<07:38, 76.39s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:  29%|##8       | 2/7 [02:38<06:37, 79.53s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:  43%|####2     | 3/7 [04:12<05:44, 86.16s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:  57%|#####7    | 4/7 [05:10<03:45, 75.02s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:  71%|#######1  | 5/7 [06:02<02:13, 66.75s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95:  86%|########5 | 6/7 [06:52<01:01, 61.27s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95: 100%|##########| 7/7 [07:09<00:00, 46.74s/it]
+                 Class     Images  Instances          P          R      mAP50   mAP50-95: 100%|##########| 7/7 [07:09<00:00, 61.38s/it]
+                   all        204        493      0.629      0.423      0.449      0.283
+       R-concentriques        204         26      0.804      0.538      0.661      0.495
+              R-rayons        204         82      0.757      0.873      0.881      0.591
+             P-feuille        204         56      0.897       0.62      0.764      0.435
+            P-triangle        204        102      0.842      0.731      0.822      0.389
+          P-union-jack        204          2      0.216        0.5      0.265      0.207
+              P-autres        204         19      0.457      0.368       0.31      0.158
+            Pointills        204         47      0.837      0.681      0.777      0.512
+            C-a-points        204         27      0.423      0.556      0.472      0.284
+  P-vertical-variation        204          5          1          0    0.00187    0.00131
+              M-carres        204         36      0.747      0.639      0.668       0.42
+             Spiderman        204         20          1       0.67       0.86      0.608
+               Arceaux        204         18     0.0912     0.0556     0.0836     0.0309
+              Rouelles        204          6          1          0     0.0141    0.00938
+             Palmettes        204         23      0.205     0.0435     0.0271     0.0202
+           Colonnettes        204         20          0          0     0.0382     0.0176
+  R-chevrons-variation        204          4      0.783        0.5       0.54      0.352
+Speed: 5.2ms pre-process, 2053.4ms inference, 3.9ms NMS per image at shape (32, 3, 640, 640)
+Results saved to [1mC:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\models\yolo\Yacine\runs\test[0m
+204 labels saved to C:\Users\malco\OneDrive\Documents\TER-2024-2025-Poincon\Codes\PoinconLab\models\yolo\Yacine\runs\test\labels

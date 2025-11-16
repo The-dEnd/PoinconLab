@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Déposer un modèle</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        form {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fffaf2;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        label, select, input {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #5a4634;
+        }
+        input[type="submit"] {
+            background-color: #8c6b4e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #5a4634;
+        }
+        .step-block {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fffaf2;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #5a4634;
+        }
+        .step-icon {
+            width: 24px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #8c6b4e;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        #log-output {
+            background: #f9f7f3;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            display: none;
+            font-size: 16px;
+            color: #5a4634;
+        }
+        #final-message {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 30px;
+        }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <h1>Poinçon LAB</h1>
+
+    <!-- Barre de navigation -->
+    <nav>
+        <ul>
+            <li><a href="/">Visualisation</a></li>
+            <li><a href="/analyse">Analyse</a></li>
+            <li><a href="/upload_model"  class="active">Upload Model</a></li>
+            <li><a href="/predict">Prediction</a></li>
+        </ul>
+    </nav>
+    <h1>Espace de dépôt de modèle</h1>
+
+    <form id="uploadForm">
+        <label for="model_type">Type de modèle :</label>
+        <select name="model_type" id="model_type">
+            <option value="yolo">YOLO</option>
+            <option value="fasterrcnn">FasterRCNN</option>
+        </select>
+
+        <label for="model_name">Nom du modèle :</label>
+        <input type="text" name="model_name" id="model_name" required>
+
+        <label for="model_file">Uploader le dossier compressé (.zip) :</label>
+        <input type="file" name="model_file" id="model_file" accept=".zip" required>
+
+        <input type="submit" id="submit-btn" value="Envoyer">
+    </form>
+
+    <div class="step-block" id="steps">
+        <div class="step-item" id="step1"><span class="step-icon"></span>Dézipage en cours...</div>
+        <div class="step-item" id="step2"><span class="step-icon"></span>Inférence en attente...</div>
+        <div id="log-output"></div>
+        <div class="step-item" id="step3"><span class="step-icon"></span>Création du fichier resultats.json...</div>
+        <div id="final-message"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submit-btn');
+        const stepsDiv = document.getElementById('steps');
+        const finalMessage = document.getElementById('final-message');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const logOutput = document.getElementById('log-output');
+
+        function setWaiting(step, text) {
+            step.querySelector('.step-icon').textContent = "⌛";
+            step.childNodes[1].textContent = text;
+        }
+        function setLoading(step, text) {
+            step.querySelector('.step-icon').innerHTML = '<span class="spinner"></span>';
+            step.childNodes[1].textContent = text;
+        }
+        function setDone(step, text) {
+            step.querySelector('.step-icon').textContent = "✅";
+            step.childNodes[1].textContent = text;
+        }
+        function setError(step, text) {
+            step.querySelector('.step-icon').textContent = "❌";
+            step.childNodes[1].textContent = text;
+        }
+        let pollingInterval;
+        function startLogPolling(modelName) {
+            logOutput.style.display = 'block';
+            pollingInterval = setInterval(async () => {
+                const res = await fetch(`/inference_log/${modelName}`);
+                const data = await res.json();
+                if (data.log) {
+                    const lines = data.log.split('\n');
+                    // Filtrer ligne de progression YOLO avec mAP et pourcentage
+                    const progressLines = lines.filter(line => line.includes('mAP50') && line.includes('%|'));
+                    const last = progressLines.length > 0 ? progressLines[progressLines.length - 1] : null;
+                    if (last) {
+                        const match = last.match(/(\d{1,3})%\|.*?\[([^\]]+)/);
+                        if (match) {
+                            const percent = match[1];
+                            const time = match[2];
+                            logOutput.textContent = `📊 Avancement : ${percent}% | Temps estimé : ${time}`;
+                            logOutput.scrollTop = logOutput.scrollHeight;
+                        }
+                    } else {
+                        logOutput.textContent = `📊 Avancement : 0% | Temps estimé : en cours de calcul...`;
+                    }
+                }
+            }, 60000); // 1 minute
+        }
+
+        function stopLogPolling() {
+            clearInterval(pollingInterval);
+        }
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const modelType = document.getElementById('model_type').value;
+            const modelName = document.getElementById('model_name').value;
+
+            // Vérifier l'existence du dossier
+            const check = await fetch(`/check_model_exists/${modelType}/${modelName}`);
+            const result = await check.json();
+            if (result.exists) {
+                alert('❌ Ce nom de modèle existe déjà. Choisissez un autre nom.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            form.style.display = 'none';
+            stepsDiv.style.display = 'block';
+
+            const formData = new FormData(form);
+
+            try {
+                setLoading(step1, "Dézipage en cours...");
+                const uploadResp = await fetch('/upload_zip', {
+                    method: 'POST',
+                    body: formData
+                });
+                const uploadData = await uploadResp.json();
+                if (uploadData.status !== 'ok') throw new Error(uploadData.message);
+                setDone(step1, "Dézipage terminé.");
+
+                setLoading(step2, "Inférence en cours...");
+                startLogPolling(modelName);
+                const infResp = await fetch(`/run_inference/${modelName}`, { method: 'POST' });
+                const infData = await infResp.json();
+                stopLogPolling();
+                if (infData.status !== 'ok') throw new Error(infData.message);
+                setDone(step2, "Inférence terminée.");
+                logOutput.style.display = 'none';
+
+                setLoading(step3, "Génération du fichier resultats.json...");
+                const jsonResp = await fetch(`/generate_json/${modelName}`, { method: 'POST' });
+                const jsonData = await jsonResp.json();
+                if (jsonData.status !== 'ok') throw new Error(jsonData.message);
+                setDone(step3, "Fichier JSON généré avec succès.");
+
+                finalMessage.innerHTML = '🎉 <span style="color:green">Succès !</span> Votre modèle est prêt à être utilisé.';
+            } catch (err) {
+                stopLogPolling();
+                setError(step1, 'Erreur : ' + err.message);
+                finalMessage.innerHTML = `<span style="color:red">Erreur :</span> ${err.message}`;
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setWaiting(step1, "Dézipage en attente...");
+            setWaiting(step2, "Inférence en attente...");
+            setWaiting(step3, "Création du fichier JSON en attente...");
+        });
+    </script>
+</body>
+</html>

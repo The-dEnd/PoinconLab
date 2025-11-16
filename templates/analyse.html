@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse YOLO</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script type="text/x-mathjax-config">
+        window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+              skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+          };
+          
+    </script>
+    <script type="text/javascript" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/error.js"></script>
+</head>
+<body>
+
+    <h1>Poinçon LAB</h1>
+
+    <!-- Barre de navigation -->
+    <nav>
+        <ul>
+            <li><a href="/">Visualisation</a></li>
+            <li><a href="/analyse" class="active">Analyse</a></li>
+            <li><a href="/upload_model">Upload Model</a></li>
+            <li><a href="/predict">Prediction</a></li>
+        </ul>
+    </nav>
+    <h1>Statistiques des Poinçons</h1>
+    
+    <!-- MEHDI STATS -->
+    <div class="statistics">
+        <h2>Statistiques Globales</h2>
+        <p><strong>Total d'images :</strong> {{ statistiques.total_images }}</p>
+        <p><strong>Taux de détection par image :</strong> (nombre de boîtes détectées correctement / nombre de boîtes à détecter) : {{ statistiques.taux_detection_par_image }}% ({{ statistiques.taux_detection_par_image_text }})</p>
+        <p><strong>Taux global d'association :</strong> (nombre de boîtes correctement classées / nombre de boîtes détectées) : {{ statistiques.taux_global_association }}% ({{ statistiques.taux_global_association_text }})</p>
+        <p><strong>Taux global de classification correcte :</strong> (nombre de boîtes correctement classées / nombre de boîtes détectées correctement) : {{ statistiques.taux_global_classification_correcte }}% ({{ statistiques.taux_global_classification_correcte_text }})</p>
+        <p><strong>Score global combiné :</strong> {{ statistiques.score_combine }}%</p>
+        <p><strong>Taux de classe correcte basée sur la 1ère prédiction :</strong> (nombre de boîtes correctement classées via top 1 / nombre de boîtes correctement classées) : {{ statistiques.taux_first_correct_class }}% ({{ statistiques.taux_first_correct_class_text }})</p>
+        <p><strong>F1-score pondéré sur le nombre de boîtes détectées correctement :</strong> {{ f1_pondere }}%</p>
+        <p style="margin-top:2em ;"><strong>Note* : Le "nombre de boîtes détectées correctement"</strong> correspond au nombre de boîtes détectées par YOLO qui ont un <strong>IoU</strong> supérieur à 0.5 par rapport à une boîte étiquetée. L'<strong>IoU</strong> est défini comme suit :<br>
+            <div style="background-color: #f9f9f9; padding: 10px; border-left: 4px solid #007bff;">
+                \[
+                \text{IoU} = \frac{\text{Aire de l'intersection}}{\text{Aire de l'union}}
+                \]
+            </div>
+            Si <strong>IoU > 0.5</strong>, la boîte prédite est considérée comme détectée correctement, même si sa classification est incorrecte.</p>
+            <p>La formule utilisée pour le calcul du score global combiné est :</p>
+            <div style="background-color: #f9f9f9; padding: 10px; border-left: 4px solid #007bff;">
+                $$
+                \text{Score Combiné} = \sqrt{\text{Taux}_{\text{détection}} \cdot \text{Taux}_{\text{association}} \cdot \text{Taux}_{\text{classification}}}
+                $$
+            </div>
+            
+        <p>Cette formule permet d'équilibrer les trois indicateurs en évitant qu'une métrique trop faible ou trop élevée domine le résultat. Cela reflète mieux la performance globale du modèle.</p>
+
+    </div>
+
+    <!-- Statistiques par catégorie et visibilité -->
+    <h2 class="analyse-h2">Statistiques par Catégorie et Visibilité</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Catégorie</th>
+                <th>Visibilité</th>
+                <th>Taux de Détection par Image</th>
+                <th>Taux d'Association Global</th>
+                <th>Taux de Classification Correcte</th>
+                <th>Score Combiné</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for (category, visibility), stats in statistiques_par_categorie.items() %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ visibility }}</td>
+                    <td>{{ stats.taux_detection_par_image }}%</td>
+                    <td>{{ stats.taux_global_association }}%</td>
+                    <td>{{ stats.taux_global_classification_correcte }}%</td>
+                    <td>{{ stats.score_combine }}%</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Matrice de confusion -->
+    <h2 class="analyse-h2">Matrice de Confusion</h2>
+    <div class="image-container">
+        <img src="data:image/png;base64,{{ image_base64 }}" alt="Matrice de confusion">
+    </div>
+    
+
+    <!-- Statistiques par classe -->
+    <h2 class="analyse-h2">Statistiques par Classe</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Classe</th>
+                <th>Précision</th>
+                <th>Rappel</th>
+                <th>F1-Score</th>
+                <th>TP</th>
+                <th>FP</th>
+                <th>FN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in stats %}
+                <tr>
+                    <td>"{{ class_names[stat.class_idx] }}"</td>
+                    <td>{{ stat.precision }}</td>
+                    <td>{{ stat.recall }}</td>
+                    <td>{{ stat.f1 }}</td>
+                    <td>{{ stat.tp }}</td>
+                    <td>{{ stat.fp }}</td>
+                    <td>{{ stat.fn }}</td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>    
+    <div id="error-container" data-robert='{{ error_trends | tojson }}'>
+        <div class="error-analysis">
+            <h2 class="analyse-h2">Analyse des Erreurs de Classification</h2>
+
+    
+            <div id="chart">
+                
+                <div>
+                    <div>
+                        <label for="class-selector">Choisir une classe réelle :</label>
+                        <select id="class-selector">
+                        </select>
+                    </div>
+                    <canvas id="error-pie-chart"></canvas>
+                </div>
+
+                <div id="others-details" style="display: none;">
+                    <h3>Détails des Classes dans "Autres"</h3>
+                    <ul id="others-list">
+                    </ul>
+                </div>
+            </div>
+        
+
+        </div>
+        
+    </div>
+</body>
+</html>
+

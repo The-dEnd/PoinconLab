@@ -1,0 +1,412 @@
+/* Général */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f1ec;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 30px;
+  color: #5a4634;
+}
+.analyse-h2{
+  position: relative;
+  display: inline-block; /* Ajuste la largeur au contenu */
+  padding: 10px 20px; /* Ajoute un peu d'espace autour du texte */
+  background-color: #d6c3b1; /* Marron clair */
+  border-radius: 15px; /* Contour arrondi */
+  color: #8c6b4e; /* Couleur du texte */
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optionnel : ajoute une ombre pour un effet 3D */
+  margin: 20px auto;
+  text-align: center; /* Centre le texte */
+  left: 50%;
+  transform: translateX(-50%);
+}
+/* Container principal */
+.container {
+  width: 80%;
+  margin: 0 auto;
+}
+
+/* Sections */
+#filters, #image-display, #box-details {
+  background-color: #fffaf2;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px 0;
+}
+
+#box-details {
+  display: flex;
+}
+
+#box-details div {
+  width: 50%;
+}
+
+#image-selector {
+  background-color: #fffaf2;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#filters h2, #image-selector h2, #image-display h2, #box-details h2 {
+  color: #8c6b4e;
+}
+
+/* Filtres */
+#filters label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+#filters select, #filters button {
+  padding: 8px;
+  margin: 10px 0;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+#filters button {
+  background-color: #8c6b4e;
+  color: white;
+  cursor: pointer;
+}
+
+#filters button:hover {
+  background-color: #5a4634;
+}
+
+/* Liste des images */
+#image-selector ul {
+  list-style: none;
+  padding: 0;
+}
+
+#image-selector li {
+  padding: 10px;
+  margin: 5px;
+  background-color: #f0e6dc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#image-selector li:hover {
+  background-color: #d6c3b1;
+}
+
+/* Image et Canvas */
+#image-display {
+  text-align: center;
+}
+
+#selected-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Canvas de boîtes */
+#bounding-boxes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+/* Liste des boîtes */
+#boxes-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+#boxes-details li {
+  padding: 10px;
+  margin: 5px;
+  background-color: #f0e6dc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#boxes-details li:hover {
+  background-color: #d6c3b1;
+}
+
+/* Liens de masquage/affichage des boîtes */
+.toggle-box {
+  text-decoration: none;
+  color: #8c6b4e;
+}
+
+.toggle-box.hidden {
+  color: #ccc;
+  text-decoration: line-through;
+}
+
+.hidden {
+  display: none;
+}
+
+#global-info {
+  background-color: #f8f4ee;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+#global-info h3 {
+  margin-top: 0;
+}
+
+#global-info p {
+  font-size: 14px;
+  color: #5a4634;
+}
+
+/* Barre de navigation */
+nav {
+  background-color: #8c6b4e;
+  padding: 10px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+nav ul li {
+  margin: 0 15px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav ul li a:hover {
+  background-color: #5a4634;
+  color: #ffffff;
+}
+
+nav ul li a.active {
+  background-color: #4e3727;
+  color: white;
+}
+
+/* Général pour Analyse */
+#analyse-content {
+  padding: 20px;
+  background-color: #fffaf2;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 80%;
+}
+
+.statistics {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f8f4ee;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.statistics h2 {
+  color: #8c6b4e;
+}
+
+.statistics p {
+  font-size: 16px;
+  margin: 10px 0;
+  color: #5a4634;
+}
+
+/* Tableaux */
+/* Tableaux */
+table {
+  max-width: 80%; /* Rétrécir les tableaux */
+  margin: 20px auto; /* Centrer les tableaux */
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+
+table thead {
+  background-color: #8c6b4e;
+  color: white;
+}
+
+table th,
+table td {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f9f4ec;
+}
+
+table tbody tr:hover {
+  background-color: #efe2d1;
+}
+
+table th {
+  font-weight: bold;
+  text-align: center;
+}
+
+table td {
+  text-align: center;
+  color: #5a4634;
+}
+
+
+/* Tableaux */
+.confusion-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  table-layout: fixed; /* Fixe la largeur de la table pour uniformiser les cellules */
+}
+
+.confusion-matrix thead {
+  background-color: #007BFF;
+  color: white;
+}
+
+.confusion-matrix th,
+.confusion-matrix td {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  width: 50px; /* Fixe une largeur pour les cellules */
+  height: 50px; /* Fixe une hauteur pour les cellules, égal à la largeur */
+  text-align: center;
+  word-wrap: break-word; /* Permet de couper le texte trop long */
+  overflow: hidden; /* Cache le texte qui déborde */
+}
+
+.confusion-matrix tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.confusion-matrix tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.confusion-matrix th {
+  font-weight: bold;
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.confusion-matrix td {
+  color: #333;
+}
+
+.confusion-matrix .diagonal {
+  background-color: red;
+}
+
+/* Statistiques par classe */
+.stats-class {
+  margin: 30px 0;
+}
+
+.stats-class h2 {
+  color: #007BFF;
+}
+
+.stats-class table th {
+  background-color: #004080;
+}
+
+.stats-class table tbody td {
+  color: #007BFF;
+}
+
+.stats-class table tbody tr:hover {
+  background-color: #e0f7ff;
+}
+
+
+#chart{
+  display: flex;
+  width: 100vw;
+  justify-content: center;
+}
+
+#chart div{
+  width: 40%;
+}
+
+
+.image-container {
+  display: flex;
+  justify-content: center; /* Centre horizontalement */
+  align-items: center;     /* Centre verticalement (optionnel) */
+  margin: 20px 0;          /* Ajoute de l'espace autour */
+}
+
+.image-container img {
+  width: 105vh;              /* Rétrécit l'image (ajuste le pourcentage selon tes besoins) */
+  height: auto;            /* Garde les proportions */
+  border-radius: 8px;      /* Facultatif : coins arrondis */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Facultatif : ombre pour un look moderne */
+}
+
+/* Boutons Précédent et Suivant */
+#prev-image, #next-image {
+  padding: 10px 20px; /* Espace intérieur */
+  background-color: #8c6b4e; /* Marron principal */
+  color: white; /* Texte en blanc */
+  border: none; /* Pas de bordure */
+  border-radius: 5px; /* Coins légèrement arrondis */
+  font-size: 16px; /* Taille de police lisible */
+  font-weight: bold;
+  cursor: pointer; /* Curseur pointeur pour montrer que c'est cliquable */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Effets au survol */
+  margin: 10px; /* Espacement entre les boutons */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre subtile */
+}
+
+#prev-image:hover, #next-image:hover {
+  background-color: #5a4634; /* Couleur marron plus foncée au survol */
+  transform: scale(1.05); /* Légère augmentation de taille */
+}
